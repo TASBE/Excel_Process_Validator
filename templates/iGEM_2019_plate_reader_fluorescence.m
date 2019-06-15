@@ -31,7 +31,7 @@ template.variables = {...
     {'experiment_MEFL',             'Fluorescence per Particle', 'B45:M52'};
     };
 
-template.blank_file = 'iGEM 2019 Plate Reader Fluorescence Calibration.xlsx';
+template.blank_file = './templates/iGEM 2019 Plate Reader Fluorescence Calibration.xlsx';
 
 template.fixed_values = {...
     % Particle calibration sheet

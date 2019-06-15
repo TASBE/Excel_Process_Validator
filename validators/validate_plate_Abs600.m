@@ -57,7 +57,12 @@ end
 % TODO: restrict this to only the control wells
 %
 % use experiment_blank_wells to exclude values for checking from experiment_particles
-Brow = unicode2native([abs600_experiment.experiment_blank_wells{1} abs600_experiment.experiment_blank_wells{3}])-64;
+rownames = [abs600_experiment.experiment_blank_wells{1} abs600_experiment.experiment_blank_wells{3}];
+if is_octave()
+    Brow = unicode2utf8(rownames)-64;
+else
+    Brow = unicode2native(rownames)-64;
+end    
 Bcol = cellfun(@str2num,{abs600_experiment.experiment_blank_wells{2} abs600_experiment.experiment_blank_wells{4}});
 blanks = abs600_experiment.experiment_particles(min(Brow):max(Brow),min(Bcol):max(Bcol));
 sans_blanks = abs600_experiment.experiment_particles;

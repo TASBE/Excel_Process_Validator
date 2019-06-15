@@ -13,7 +13,7 @@ template.variables = {...
     {'MEFL_per_au',         'Bead Calibration', 'C11'};
     };
 
-template.blank_file = 'iGEM 2019 Flow Cytometry Fluorescence Calibration.xlsx';
+template.blank_file = './templates/iGEM 2019 Flow Cytometry Fluorescence Calibration.xlsx';
 
 template.fixed_values = {...
     % Bead calibration

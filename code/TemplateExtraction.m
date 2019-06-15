@@ -37,7 +37,27 @@ classdef TemplateExtraction
                     var = template.variables{i};
                     % get the type of the variable
                     if numel(var)<4, type = 'number'; else type = var{4}; end;
+                    % TODO: figure out how to deal with the fact that octave strips blank rows on read, thus shrinking the size of the range being read
                     [~,~,raw] = xlsread(file,var{2},var{3});
+                    % check what size the raw should be, and expand if needed (for octave, which strips blank rows)
+                    block_size = TemplateExtraction.excelRangeSize(var{3});
+                    read_size = size(raw);
+                    %fprintf('Range %s is %i by %i\n',var{3},block_size(1),block_size(2));
+                    if numel(raw) < prod(block_size)
+                        %fprintf('Resizing %s from %ix%i to %ix%i\n',var{1},size(raw,1),size(raw,2),block_size(1),block_size(2));
+                        for r = (read_size(1)+1):block_size(1),
+                            for c = 1:block_size(2),
+                                raw{r,c} = nan;
+                            end
+                        end
+                        for r = 1:block_size(1),
+                            for c = (read_size(2)+1):block_size(2),
+                                raw{r,c} = nan;
+                            end
+                        end
+                    end
+                    % turn empty cells into NaNs (for octave)
+                    for j=1:numel(raw), if isempty(raw{j}), raw{j} = NaN; end; end;
                     switch type
                         case 'number'
                             converted = zeros(size(raw));
@@ -53,14 +73,14 @@ classdef TemplateExtraction
                             converted = cell(size(raw));
                             for j=1:numel(raw), 
                                 if isnumeric(raw{j}), converted{j}=num2str(raw{j}); 
-                                else converted{j}=raw{j};
+                                else converted{j}=raw{j};  
                                 end;
                             end
                         otherwise
                             EPVSession.error('TemplateExtraction','BadRangeType','Variable %s from sheet ''%s'' range %s has unknown type ''%s''',var{1},var{2},var{3},type);
                     end
                     extracted.(var{1}) = converted;
-                catch
+                catch e
                     EPVSession.warn('TemplateExtraction','FailedRangeRead','Unable to read %s variable %s from sheet ''%s'' range %s',type,var{1},var{2},var{3});
                     failed = true;
                 end
@@ -133,6 +153,19 @@ classdef TemplateExtraction
             end
             % if we passed everything, they are the same
             same = true;
+        end
+        
+        % turn an Excel range string into 
+        function dim = excelRangeSize(range)
+            % NOTE: this will only work for A-Z columns at present
+            coord = sscanf(range,'%c%i:%c%i');
+            if numel(coord) == 2,  % single cell
+                dim = [1 1];
+            elseif numel(coord) ==4,
+                dim = [coord(4)-coord(2)+1, coord(3)-coord(1)+1];
+            else
+                EPVSession.error('TemplateExtraction','BadRange','Could not compute size of template range ''%s''. Note that ranges cannot go beyond column Z.',range);
+            end
         end
     end
 end

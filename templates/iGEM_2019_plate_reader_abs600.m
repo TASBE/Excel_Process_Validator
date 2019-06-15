@@ -15,11 +15,11 @@ template.variables = {...
     {'experiment_Abs600',           'Raw Plate Reader Measurements', 'B12:M19'};
     {'experiment_blank_wells',      'Raw Plate Reader Measurements', 'D5:D8', 'string'};
     % Calibrated plate data
-    {'experiment_particles',        'Equivalent Particle Count', 'B23:M30'};
-    {'experiment_net_Abs600',       'Equivalent Particle Count', 'B34:M41'};
+    {'experiment_particles',        'Equivalent Particle Count', 'B9:M16'};
+    {'experiment_net_Abs600',       'Equivalent Particle Count', 'B20:M27'};
     };
 
-template.blank_file = 'iGEM 2019 Plate Reader Abs600 Calibration.xlsx';
+template.blank_file = './templates/iGEM 2019 Plate Reader Abs600 Calibration.xlsx';
 
 template.fixed_values = {...
     % Particle calibration sheet
