@@ -63,7 +63,11 @@ classdef TemplateExtraction
                             converted = zeros(size(raw));
                             for j=1:numel(raw), 
                                 if isnumeric(raw{j}), converted(j)=raw{j}; 
+                                % check for the various non-numeric placeholders
                                 elseif strcmp(raw{j},'---'), converted(j)=NaN;
+                                elseif strcmp(raw{j},'#VALUE!'), converted(j)=NaN;
+                                elseif strcmp(raw{j},'#DIV/0!'), converted(j)=NaN;
+                                elseif strcmp(raw{j},'Overflow'), converted(j)=NaN;
                                 else
                                     EPVSession.warn('TemplateExtraction','NonNumericValue','Numeric variable %s from sheet ''%s'' range %s contains non-numeric value ''%s''',var{1},var{2},var{3},raw{j});
                                     failed = true;
@@ -157,14 +161,42 @@ classdef TemplateExtraction
         
         % turn an Excel range string into 
         function dim = excelRangeSize(range)
-            % NOTE: this will only work for A-Z columns at present
-            coord = sscanf(range,'%c%i:%c%i');
-            if numel(coord) == 2,  % single cell
+            separators = find(range==':'); % find the colon separators
+            if numel(separators) == 0 % no separator --> single cell
                 dim = [1 1];
-            elseif numel(coord) ==4,
-                dim = [coord(4)-coord(2)+1, coord(3)-coord(1)+1];
-            else
-                EPVSession.error('TemplateExtraction','BadRange','Could not compute size of template range ''%s''. Note that ranges cannot go beyond column Z.',range);
+            elseif numel(separators) == 1
+                r1 = range(1:(separators-1));
+                c1 = TemplateExtraction.excelCoordToPoint(r1);
+                r2 = range((separators+1):end);
+                c2 = TemplateExtraction.excelCoordToPoint(r2);
+                dim = [abs(c2(1)-c1(1))+1, abs(c2(2)-c1(2))+1];
+            else % can't have more than 1 separator
+                EPVSession.error('TemplateExtraction','BadRange','Found more than one '':'' separator in range ''%s''',range);
+            end
+        end
+        
+        % Turn an excel coordinate into [row col]
+        function point = excelCoordToPoint(coord)
+            try 
+                % try a 1-character column name
+                components = sscanf(coord,'%c%i');
+                % if it fails, try a 2-character column name
+                if numel(components)~=2, 
+                    components = sscanf(coord,'%c%c%i'); 
+                    assert(numel(components)==3);
+                    % Assume column is ASCII upcase
+                    char1 = components(1)-64; 
+                    char2 = components(2)-64;
+                    assert(char1>0 && char1<=26 && char2>0 && char2<=26);
+                else
+                    char1 = 0;
+                    char2 = components(1)-64; % Assume column is ASCII upcase
+                    assert(char2>0 && char2<=26);
+                end;
+                point(1) = components(end); % number is the row
+                point(2) = char1*26 + char2;
+            catch
+                EPVSession.error('TemplateExtraction','BadRange','Could not interpret Excel coordinate ''%s''',coord);
             end
         end
     end
