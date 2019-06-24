@@ -10,6 +10,21 @@ function test_suite = test_extraction
     end
     warning(save_warning_state);
 
+    
+function test_point_extractor
+
+c = TemplateExtraction.excelCoordToPoint('J23');
+assertEqual(c,[23 10]);
+c = TemplateExtraction.excelCoordToPoint('AC5');
+assertEqual(c,[5 29]);
+c = TemplateExtraction.excelCoordToPoint('GA499');
+assertEqual(c,[499 183]);
+r = TemplateExtraction.excelRangeSize('B4:C7');
+assertEqual(r,[4 2]);
+r = TemplateExtraction.excelRangeSize('X13:AA13');
+assertEqual(r,[1 4]);
+
+
 function test_good_extraction
 
 testfile = './tests/samples/iGEM 2019 Plate Reader Fluorescence Calibration - Example.xlsx';
