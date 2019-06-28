@@ -157,7 +157,9 @@ classdef TemplateExtraction
             if ~isempty(find(size(raw1)~=size(raw2),1)), return; end;
             % every element must be the same
             for i=1:numel(raw1)
-                if isnumeric(raw1{i}) && isnumeric(raw2{i})
+                if isempty(raw1{i}) || isempty(raw2{i}) % handle emptiness separately, since tests don't work right 
+                    if ~isempty(raw1{i}) && isempty(raw2{i}), return; end;
+                elseif isnumeric(raw1{i}) && isnumeric(raw2{i})
                     if isnan(raw1{i}) && isnan(raw2{i}), continue; end; % nan's aren't ==, but match
                     if raw1{i} ~= raw2{i}, return; end;
                 elseif ischar(raw1{i}) && ischar(raw2{i})
