@@ -23,6 +23,10 @@ r = TemplateExtraction.excelRangeSize('B4:C7');
 assertEqual(r,[4 2]);
 r = TemplateExtraction.excelRangeSize('X13:AA13');
 assertEqual(r,[1 4]);
+pp = TemplateExtraction.excelRangeToPoints('A3');
+assertEqual(pp,[3     1     3     1]);
+pp = TemplateExtraction.excelRangeToPoints('G2:J5');
+assertEqual(pp,[2     7     5    10]);
 
 
 function test_good_extraction
