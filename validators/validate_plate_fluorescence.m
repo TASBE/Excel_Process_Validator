@@ -3,7 +3,7 @@ function valid = validate_plate_fluorescence(fluorescence_experiment)
 valid = true;
 
 %%% Check that the max / min non-NaN fluorescein calibration values are at least a reasonable minimum range
-au_range = max(fluorescence_experiment.au_raw(:)) / min(fluorescence_experiment.au_raw(:));
+au_range = max(fluorescence_experiment.au_raw(:)) / abs(min(fluorescence_experiment.au_raw(:)));
 MIN_FLUORESCEIN_RANGE = 20;
 if au_range < MIN_FLUORESCEIN_RANGE || isnan(au_range)
     EPVSession.warn('Fluorescence','DynamicRange','Dynamic range of fluorescein calibration values %.2f is not at least %i-fold',au_range,MIN_FLUORESCEIN_RANGE);

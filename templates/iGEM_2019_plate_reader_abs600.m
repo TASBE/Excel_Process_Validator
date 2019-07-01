@@ -19,7 +19,7 @@ template.variables = {...
     {'experiment_net_Abs600',       'Equivalent Particle Count', 'B20:M27'};
     };
 
-template.blank_file = './templates/iGEM 2019 Plate Reader Abs600 Calibration.xlsx';
+template.blank_file = 'iGEM 2019 Plate Reader Abs600 Calibration.xlsx';
 
 template.fixed_values = {...
     % Particle calibration sheet
