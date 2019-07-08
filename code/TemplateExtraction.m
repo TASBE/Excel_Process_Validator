@@ -125,7 +125,12 @@ classdef TemplateExtraction
             blank_cache = cache;
             for i=1:numel(sheets),
                 try
-                    [~,~,blank_cache{i,2}] = xlsread(template.blank_file, sheets{i}); % read the blank sheets for comparison
+                    if is_octave()
+                        effective_blank = file_in_loadpath(template.blank_file);
+                    else
+                        effective_blank = template.blank_file;
+                    end
+                    [~,~,blank_cache{i,2}] = xlsread(effective_blank, sheets{i}); % read the blank sheets for comparison
                 catch
                 EPVSession.error('TemplateExtraction','MissingTemplateSheet','Internal error: blank template file missing sheet %s',sheets{i});
                 end
