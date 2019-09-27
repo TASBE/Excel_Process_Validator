@@ -8,22 +8,22 @@
 % exception, as described in the file LICENSE in the BBN Flow Cytometry
 % package distribution's top directory.
 
-classdef TemplateExtraction
+classdef ExcelTemplateExtraction
     methods(Static)
         % Constuctor with filepath of template and optional coordinates
         % property as inputs
         function extracted = extract(file, template)
             % Make sure the file exists
             if ~exist(file,'file')
-                EPVSession.error('TemplateExtraction','MissingFile','Could not find Excel file %s',file);
+                EPVSession.error('ExcelTemplateExtraction','MissingFile','Could not find Excel file %s',file);
             end
-            EPVSession.succeed('TemplateExtraction','FoundFile','Found excel file %s',file);
+            EPVSession.succeed('ExcelTemplateExtraction','FoundFile','Found excel file %s',file);
             
             % validate that template is intact
-            [~,cache] = TemplateExtraction.checkTemplateIntegrity(file, template);
+            [~,cache] = ExcelTemplateExtraction.checkTemplateIntegrity(file, template);
             
             % read the variables of the template
-            extracted = TemplateExtraction.retrieveVariables(file, template, cache);
+            extracted = ExcelTemplateExtraction.retrieveVariables(file, template, cache);
         end
         
     end
@@ -38,9 +38,9 @@ classdef TemplateExtraction
                     % get the type of the variable
                     if numel(var)<4, type = 'number'; else type = var{4}; end;
                     % TODO: figure out how to deal with the fact that octave strips blank rows on read, thus shrinking the size of the range being read
-                    raw = TemplateExtraction.readExcelFromCache(cache,var{2},var{3});
+                    raw = ExcelTemplateExtraction.readExcelFromCache(cache,var{2},var{3});
                     % check what size the raw should be, and expand if needed (for octave, which strips blank rows)
-                    block_size = TemplateExtraction.excelRangeSize(var{3});
+                    block_size = ExcelTemplateExtraction.excelRangeSize(var{3});
                     read_size = size(raw);
                     %fprintf('Range %s is %i by %i\n',var{3},block_size(1),block_size(2));
                     if numel(raw) < prod(block_size)
@@ -69,7 +69,7 @@ classdef TemplateExtraction
                                 elseif strcmp(raw{j},'#DIV/0!'), converted(j)=NaN;
                                 elseif strcmp(raw{j},'Overflow'), converted(j)=NaN;
                                 else
-                                    EPVSession.warn('TemplateExtraction','NonNumericValue','Numeric variable %s from sheet ''%s'' range %s contains non-numeric value ''%s'' (permitted non-numeric values are: ---, #VALUE!, #DIV/0!, Overflow)',var{1},var{2},var{3},raw{j});
+                                    EPVSession.warn('ExcelTemplateExtraction','NonNumericValue','Numeric variable %s from sheet ''%s'' range %s contains non-numeric value ''%s'' (permitted non-numeric values are: ---, #VALUE!, #DIV/0!, Overflow)',var{1},var{2},var{3},raw{j});
                                     failed = true;
                                 end;
                             end
@@ -81,18 +81,18 @@ classdef TemplateExtraction
                                 end;
                             end
                         otherwise
-                            EPVSession.error('TemplateExtraction','BadRangeType','Variable %s from sheet ''%s'' range %s has unknown type ''%s''',var{1},var{2},var{3},type);
+                            EPVSession.error('ExcelTemplateExtraction','BadRangeType','Variable %s from sheet ''%s'' range %s has unknown type ''%s''',var{1},var{2},var{3},type);
                     end
                     extracted.(var{1}) = converted;
                 catch e
-                    EPVSession.warn('TemplateExtraction','FailedRangeRead','Unable to read %s variable %s from sheet ''%s'' range %s',type,var{1},var{2},var{3});
+                    EPVSession.warn('ExcelTemplateExtraction','FailedRangeRead','Unable to read %s variable %s from sheet ''%s'' range %s',type,var{1},var{2},var{3});
                     failed = true;
                 end
             end
             if failed,
-                EPVSession.error('TemplateExtraction','FailedExtraction','Some variables were unable to be read');
+                EPVSession.error('ExcelTemplateExtraction','FailedExtraction','Some variables were unable to be read');
             end
-            EPVSession.succeed('TemplateExtraction','Extraction','All variables were extracted');
+            EPVSession.succeed('ExcelTemplateExtraction','Extraction','All variables were extracted');
         end
         
         function [sheets, cache] = checkTemplateIntegrity(file, template)
@@ -113,14 +113,14 @@ classdef TemplateExtraction
                 end
             end
             if ~isempty(missing_sheets)
-                EPVSession.error('TemplateExtraction','MissingSheets','In %s, could not find expected sheet(s): %s',file, missing_sheets);
+                EPVSession.error('ExcelTemplateExtraction','MissingSheets','In %s, could not find expected sheet(s): %s',file, missing_sheets);
             end
-            EPVSession.succeed('TemplateExtraction','ValidSheets','All expected sheets are present');
+            EPVSession.succeed('ExcelTemplateExtraction','ValidSheets','All expected sheets are present');
             
             %%% confirm that all expected fixed sections of the sheets match the blank template file
             % first, load the blank
             if ~exist(template.blank_file,'file')
-                EPVSession.error('TemplateExtraction','MissingTemplateFile','Internal error: missing blank template file %s',template.blank_file);
+                EPVSession.error('ExcelTemplateExtraction','MissingTemplateFile','Internal error: missing blank template file %s',template.blank_file);
             end
             blank_cache = cache;
             for i=1:numel(sheets),
@@ -132,7 +132,7 @@ classdef TemplateExtraction
                     end
                     [~,~,blank_cache{i,2}] = xlsread(effective_blank, sheets{i}); % read the blank sheets for comparison
                 catch
-                EPVSession.error('TemplateExtraction','MissingTemplateSheet','Internal error: blank template file missing sheet %s',sheets{i});
+                EPVSession.error('ExcelTemplateExtraction','MissingTemplateSheet','Internal error: blank template file missing sheet %s',sheets{i});
                 end
             end
             
@@ -141,18 +141,18 @@ classdef TemplateExtraction
                 sheet = template.fixed_values{i}{1};
                 ranges = template.fixed_values{i}(2:end);
                 for j=1:numel(ranges)
-                    blank_raw = TemplateExtraction.readExcelFromCache(blank_cache,sheet,ranges{j});
-                    raw = TemplateExtraction.readExcelFromCache(cache,sheet,ranges{j});
-                    if ~TemplateExtraction.excelRangeEqual(raw,blank_raw)
+                    blank_raw = ExcelTemplateExtraction.readExcelFromCache(blank_cache,sheet,ranges{j});
+                    raw = ExcelTemplateExtraction.readExcelFromCache(cache,sheet,ranges{j});
+                    if ~ExcelTemplateExtraction.excelRangeEqual(raw,blank_raw)
                         failed = true;
-                        EPVSession.warn('TemplateExtraction','ModifiedTemplateRange','Template appears to have been modified: sheet ''%s'' range %s does not match blank',sheet,ranges{j});
+                        EPVSession.warn('ExcelTemplateExtraction','ModifiedTemplateRange','Template appears to have been modified: sheet ''%s'' range %s does not match blank',sheet,ranges{j});
                     end
                 end
             end
             if failed,
-                EPVSession.error('TemplateExtraction','ModifiedTemplate','Template appears to have been modified - some ranges that are expected to be fixed do no match');
+                EPVSession.error('ExcelTemplateExtraction','ModifiedTemplate','Template appears to have been modified - some ranges that are expected to be fixed do no match');
             end
-            EPVSession.succeed('TemplateExtraction','ValidTemplate','Template appears to be intact');
+            EPVSession.succeed('ExcelTemplateExtraction','ValidTemplate','Template appears to be intact');
         end
         
         % Internal check to see if two number/string regions are identical
@@ -184,12 +184,12 @@ classdef TemplateExtraction
                 dim = [1 1];
             elseif numel(separators) == 1
                 r1 = range(1:(separators-1));
-                c1 = TemplateExtraction.excelCoordToPoint(r1);
+                c1 = ExcelTemplateExtraction.excelCoordToPoint(r1);
                 r2 = range((separators+1):end);
-                c2 = TemplateExtraction.excelCoordToPoint(r2);
+                c2 = ExcelTemplateExtraction.excelCoordToPoint(r2);
                 dim = [abs(c2(1)-c1(1))+1, abs(c2(2)-c1(2))+1];
             else % can't have more than 1 separator
-                EPVSession.error('TemplateExtraction','BadRange','Found more than one '':'' separator in range ''%s''',range);
+                EPVSession.error('ExcelTemplateExtraction','BadRange','Found more than one '':'' separator in range ''%s''',range);
             end
         end
         
@@ -198,16 +198,16 @@ classdef TemplateExtraction
         function points = excelRangeToPoints(range)
             separators = find(range==':'); % find the colon separators
             if numel(separators) == 0 % no separator --> single cell
-                c = TemplateExtraction.excelCoordToPoint(range);
+                c = ExcelTemplateExtraction.excelCoordToPoint(range);
                 points = [c c];
             elseif numel(separators) == 1
                 r1 = range(1:(separators-1));
-                c1 = TemplateExtraction.excelCoordToPoint(r1);
+                c1 = ExcelTemplateExtraction.excelCoordToPoint(r1);
                 r2 = range((separators+1):end);
-                c2 = TemplateExtraction.excelCoordToPoint(r2);
+                c2 = ExcelTemplateExtraction.excelCoordToPoint(r2);
                 points = [c1 c2];
             else % can't have more than 1 separator
-                EPVSession.error('TemplateExtraction','BadRange','Found more than one '':'' separator in range ''%s''',range);
+                EPVSession.error('ExcelTemplateExtraction','BadRange','Found more than one '':'' separator in range ''%s''',range);
             end
         end
 
@@ -233,7 +233,7 @@ classdef TemplateExtraction
                 point(1) = components(end); % number is the row
                 point(2) = char1*26 + char2;
             catch
-                EPVSession.error('TemplateExtraction','BadRange','Could not interpret Excel coordinate ''%s''',coord);
+                EPVSession.error('ExcelTemplateExtraction','BadRange','Could not interpret Excel coordinate ''%s''',coord);
             end
         end
         
@@ -242,7 +242,7 @@ classdef TemplateExtraction
             assert(numel(which)==1); % should match precisely one sheet in cache
             
             sheet_raw = cache{which,2};
-            points = TemplateExtraction.excelRangeToPoints(range);
+            points = ExcelTemplateExtraction.excelRangeToPoints(range);
             % expand sheet if needed
             sheet_size = size(sheet_raw);
             if sheet_size(1)<points(3), sheet_raw((sheet_size(1)+1):points(3),:) = {nan}; end;

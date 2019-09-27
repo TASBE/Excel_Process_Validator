@@ -13,19 +13,19 @@ function test_suite = test_extraction
     
 function test_point_extractor
 
-c = TemplateExtraction.excelCoordToPoint('J23');
+c = ExcelTemplateExtraction.excelCoordToPoint('J23');
 assertEqual(c,[23 10]);
-c = TemplateExtraction.excelCoordToPoint('AC5');
+c = ExcelTemplateExtraction.excelCoordToPoint('AC5');
 assertEqual(c,[5 29]);
-c = TemplateExtraction.excelCoordToPoint('GA499');
+c = ExcelTemplateExtraction.excelCoordToPoint('GA499');
 assertEqual(c,[499 183]);
-r = TemplateExtraction.excelRangeSize('B4:C7');
+r = ExcelTemplateExtraction.excelRangeSize('B4:C7');
 assertEqual(r,[4 2]);
-r = TemplateExtraction.excelRangeSize('X13:AA13');
+r = ExcelTemplateExtraction.excelRangeSize('X13:AA13');
 assertEqual(r,[1 4]);
-pp = TemplateExtraction.excelRangeToPoints('A3');
+pp = ExcelTemplateExtraction.excelRangeToPoints('A3');
 assertEqual(pp,[3     1     3     1]);
-pp = TemplateExtraction.excelRangeToPoints('G2:J5');
+pp = ExcelTemplateExtraction.excelRangeToPoints('G2:J5');
 assertEqual(pp,[2     7     5    10]);
 
 
@@ -33,7 +33,7 @@ function test_good_extraction
 
 testfile = './tests/samples/iGEM 2019 Plate Reader Fluorescence Calibration - Example.xlsx';
 template = iGEM_2019_plate_reader_fluorescence();
-result = TemplateExtraction.extract(testfile,template);
+result = ExcelTemplateExtraction.extract(testfile,template);
 
 log = EPVSession.list();
 % check that the right four success messages have been created
@@ -51,7 +51,7 @@ function test_missing_sheet
 
 testfile = './tests/samples/Plate-Fluorescence-Bad1.xlsx';
 template = iGEM_2019_plate_reader_fluorescence();
-assertExceptionThrown(@()TemplateExtraction.extract(testfile,template), 'TemplateExtraction:MissingSheets', 'No error was raised.');
+assertExceptionThrown(@()ExcelTemplateExtraction.extract(testfile,template), 'ExcelTemplateExtraction:MissingSheets', 'No error was raised.');
 
 log = EPVSession.list();
 % check for one success, then a missing sheet error
@@ -65,7 +65,7 @@ function test_modified_template
 
 testfile = './tests/samples/Plate-Fluorescence-Bad2.xlsx';
 template = iGEM_2019_plate_reader_fluorescence();
-assertExceptionThrown(@()TemplateExtraction.extract(testfile,template), 'TemplateExtraction:ModifiedTemplate', 'No error was raised.');
+assertExceptionThrown(@()ExcelTemplateExtraction.extract(testfile,template), 'ExcelTemplateExtraction:ModifiedTemplate', 'No error was raised.');
 
 % modifications to catch: 
 % Particle Standard Curve: T20 was changed, all shifted down 1 line
@@ -97,7 +97,7 @@ function test_bad_abs600_data
 
 testfile = './tests/samples/Plate-Fluorescence-Bad4.xlsx';
 template = iGEM_2019_plate_reader_fluorescence();
-assertExceptionThrown(@()TemplateExtraction.extract(testfile,template), 'TemplateExtraction:FailedExtraction', 'No error was raised.');
+assertExceptionThrown(@()ExcelTemplateExtraction.extract(testfile,template), 'ExcelTemplateExtraction:FailedExtraction', 'No error was raised.');
 
 n_failures = 4;
 

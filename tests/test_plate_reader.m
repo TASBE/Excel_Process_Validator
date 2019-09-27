@@ -14,13 +14,13 @@ function test_good_fluorescence_data
 
 testfile = './tests/samples/iGEM 2019 Plate Reader Fluorescence Calibration - Example.xlsx';
 template = iGEM_2019_plate_reader_fluorescence();
-result = TemplateExtraction.extract(testfile,template);
+result = ExcelTemplateExtraction.extract(testfile,template);
 validate_plate_Abs600(result);
 validate_plate_fluorescence(result);
 
 log = EPVSession.list();
 % check that the right success messages have been created
-assertEqual(log{end-2}.contents{end}.classname, 'TemplateExtraction');
+assertEqual(log{end-2}.contents{end}.classname, 'ExcelTemplateExtraction');
 assertEqual(log{end-2}.contents{end}.name, 'Extraction');
 assertEqual(log{end-2}.contents{end}.type, 'success');
 
@@ -53,12 +53,12 @@ function test_good_abs600_data
 
 testfile = './tests/samples/iGEM 2019 Plate Reader Abs600 Calibration - Example.xlsx';
 template = iGEM_2019_plate_reader_abs600();
-result = TemplateExtraction.extract(testfile,template);
+result = ExcelTemplateExtraction.extract(testfile,template);
 validate_plate_Abs600(result);
 
 log = EPVSession.list();
 % check that the right six success messages have been created
-assertEqual(log{end-1}.contents{end}.classname, 'TemplateExtraction');
+assertEqual(log{end-1}.contents{end}.classname, 'ExcelTemplateExtraction');
 assertEqual(log{end-1}.contents{end}.name, 'Extraction');
 assertEqual(log{end-1}.contents{end}.type, 'success');
 assertEqual(numel(log{end}.contents),5);
@@ -79,13 +79,13 @@ function test_bad_abs600_data
 
 testfile = './tests/samples/Plate-Fluorescence-Bad3.xlsx';
 template = iGEM_2019_plate_reader_fluorescence();
-result = TemplateExtraction.extract(testfile,template);
+result = ExcelTemplateExtraction.extract(testfile,template);
 validate_plate_Abs600(result); % should fail
 validate_plate_fluorescence(result); % should succeed
 
 log = EPVSession.list();
 % check that the right set of failure and success messages have been created
-assertEqual(log{end-2}.contents{end}.classname, 'TemplateExtraction');
+assertEqual(log{end-2}.contents{end}.classname, 'ExcelTemplateExtraction');
 assertEqual(log{end-2}.contents{end}.name, 'Extraction');
 assertEqual(log{end-2}.contents{end}.type, 'success');
 
@@ -118,13 +118,13 @@ function test_missing_fluorescence_data
 
 testfile = './tests/samples/Plate-Fluorescence-Bad5.xlsx';
 template = iGEM_2019_plate_reader_fluorescence();
-result = TemplateExtraction.extract(testfile,template); % should be valid
+result = ExcelTemplateExtraction.extract(testfile,template); % should be valid
 validate_plate_Abs600(result); % should be valid
 validate_plate_fluorescence(result); % should fail
 
 log = EPVSession.list();
 % check that the right set of failure and success messages have been created
-assertEqual(log{end-2}.contents{end}.classname, 'TemplateExtraction');
+assertEqual(log{end-2}.contents{end}.classname, 'ExcelTemplateExtraction');
 assertEqual(log{end-2}.contents{end}.name, 'Extraction');
 assertEqual(log{end-2}.contents{end}.type, 'success');
 assertEqual(log{end-1}.contents{end}.classname, 'Abs600');
