@@ -2,8 +2,9 @@ function valid = validate_plate_Abs600(abs600_experiment)
 
 valid = true;
 
-%%% Check that the max / min non-NaN particle calibration values are at least a reasonable minimum range
-abs600_range = max(abs600_experiment.Abs600_raw(:)) / abs(min(abs600_experiment.Abs600_raw(:)));
+%%% Check that the max / min non-NaN, non-zero particle calibration values are at least a reasonable minimum range
+nonzero = abs600_experiment.Abs600_raw(:)~=0;
+abs600_range = max(abs600_experiment.Abs600_raw(nonzero)) / abs(min(abs600_experiment.Abs600_raw(nonzero)));
 MIN_PARTICLE_RANGE = 20;
 if abs600_range < MIN_PARTICLE_RANGE || isnan(abs600_range)
     EPVSession.warn('Abs600','DynamicRange','Dynamic range of Abs600 calibration values %.2f is not at least %i-fold',abs600_range,MIN_PARTICLE_RANGE);

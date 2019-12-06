@@ -14,12 +14,12 @@ function test_good_fluorescence_data
 
 testfile = './tests/samples/iGEM 2019 Flow Cytometry Fluorescence Calibration - Example.xlsx';
 template = iGEM_2019_flow_cytometer_fluorescence();
-result = TemplateExtraction.extract(testfile,template);
+result = ExcelTemplateExtraction.extract(testfile,template);
 validate_flow_fluorescence(result);
 
 log = EPVSession.list();
 % check that the right success messages have been created
-assertEqual(log{end-1}.contents{end}.classname, 'TemplateExtraction');
+assertEqual(log{end-1}.contents{end}.classname, 'ExcelTemplateExtraction');
 assertEqual(log{end-1}.contents{end}.name, 'Extraction');
 assertEqual(log{end-1}.contents{end}.type, 'success');
 
@@ -39,12 +39,12 @@ function test_bad_fluorescence_data
 
 testfile = './tests/samples/Flow-Fluorescence-Bad.xlsx';
 template = iGEM_2019_flow_cytometer_fluorescence();
-result = TemplateExtraction.extract(testfile,template);
+result = ExcelTemplateExtraction.extract(testfile,template);
 validate_flow_fluorescence(result);
 
 log = EPVSession.list();
 % check that the right success messages have been created
-assertEqual(log{end-1}.contents{end}.classname, 'TemplateExtraction');
+assertEqual(log{end-1}.contents{end}.classname, 'ExcelTemplateExtraction');
 assertEqual(log{end-1}.contents{end}.name, 'Extraction');
 assertEqual(log{end-1}.contents{end}.type, 'success');
 
