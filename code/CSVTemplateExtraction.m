@@ -1,4 +1,4 @@
-% Class for building a struct from data extracted from a template spreadsheet
+% Class for building a struct from data extracted from a CSV template spreadsheet
 %
 % Copyright (C) 2019, Raytheon BBN Technologies and contributors listed
 % in the AUTHORS file in EPV distribution's top directory.
@@ -8,22 +8,32 @@
 % exception, as described in the file LICENSE in the BBN Flow Cytometry
 % package distribution's top directory.
 
-classdef ExcelTemplateExtraction
+classdef CSVTemplateExtraction
     methods(Static)
         % Constuctor with filepath of template and optional coordinates
         % property as inputs
         function extracted = extract(file, template)
             % Make sure the file exists
             if ~exist(file,'file')
-                EPVSession.error('ExcelTemplateExtraction','MissingFile','Could not find Excel file %s',file);
+                EPVSession.error('CSVTemplateExtraction','MissingFile','Could not find CSV file %s',file);
             end
-            EPVSession.succeed('ExcelTemplateExtraction','FoundFile','Found Excel file %s',file);
+            EPVSession.succeed('CSVTemplateExtraction','FoundFile','Found CSV file %s',file);
             
             % validate that template is intact
-            [~,cache] = ExcelTemplateExtraction.checkTemplateIntegrity(file, template);
+            cache = CSVTemplateExtraction.checkTemplateIntegrity(file, template);
             
             % read the variables of the template
-            extracted = ExcelTemplateExtraction.retrieveVariables(file, template, cache);
+            extracted = CSVTemplateExtraction.retrieveVariables(file, template, cache);
+            
+            % postprocess if needed
+            if isfield(template,'postprocessing')
+                try
+                    extracted = template.postprocessing(extracted);
+                    EPVSession.succeed('CSVTemplateExtraction','Postprocessing','CSV file postprocessing succeeded');
+                catch e
+                    EPVSession.error('CSVTemplateExtraction','FailedPostprocessing','CSV file postprocessing error');
+                end
+            end
         end
         
     end
@@ -36,11 +46,11 @@ classdef ExcelTemplateExtraction
                 try 
                     var = template.variables{i};
                     % get the type of the variable
-                    if numel(var)<4, type = 'number'; else type = var{4}; end;
+                    if numel(var)<3, type = 'number'; else type = var{3}; end;
                     % TODO: figure out how to deal with the fact that octave strips blank rows on read, thus shrinking the size of the range being read
-                    raw = ExcelTemplateExtraction.readExcelFromCache(cache,var{2},var{3});
+                    raw = CSVTemplateExtraction.readCSVFromCache(cache,var{2});
                     % check what size the raw should be, and expand if needed (for octave, which strips blank rows)
-                    block_size = ExcelTemplateExtraction.excelRangeSize(var{3});
+                    block_size = CSVTemplateExtraction.excelRangeSize(var{2});
                     read_size = size(raw);
                     %fprintf('Range %s is %i by %i\n',var{3},block_size(1),block_size(2));
                     if numel(raw) < prod(block_size)
@@ -69,7 +79,7 @@ classdef ExcelTemplateExtraction
                                 elseif strcmp(raw{j},'#DIV/0!'), converted(j)=NaN;
                                 elseif strcmp(raw{j},'Overflow'), converted(j)=NaN;
                                 else
-                                    EPVSession.warn('ExcelTemplateExtraction','NonNumericValue','Numeric variable %s from sheet ''%s'' range %s contains non-numeric value ''%s'' (permitted non-numeric values are: ---, #VALUE!, #DIV/0!, Overflow)',var{1},var{2},var{3},raw{j});
+                                    EPVSession.warn('CSVTemplateExtraction','NonNumericValue','Numeric variable %s from range %s contains non-numeric value ''%s'' (permitted non-numeric values are: ---, #VALUE!, #DIV/0!, Overflow)',var{1},var{2},raw{j});
                                     failed = true;
                                 end;
                             end
@@ -81,78 +91,53 @@ classdef ExcelTemplateExtraction
                                 end;
                             end
                         otherwise
-                            EPVSession.error('ExcelTemplateExtraction','BadRangeType','Variable %s from sheet ''%s'' range %s has unknown type ''%s''',var{1},var{2},var{3},type);
+                            EPVSession.error('CSVTemplateExtraction','BadRangeType','Variable %s from range %s has unknown type ''%s''',var{1},var{2},type);
                     end
                     extracted.(var{1}) = converted;
                 catch e
-                    EPVSession.warn('ExcelTemplateExtraction','FailedRangeRead','Unable to read %s variable %s from sheet ''%s'' range %s',type,var{1},var{2},var{3});
+                    EPVSession.warn('CSVTemplateExtraction','FailedRangeRead','Unable to read %s variable %s from range %s',type,var{1},var{2});
                     failed = true;
                 end
             end
             if failed,
-                EPVSession.error('ExcelTemplateExtraction','FailedExtraction','Some variables were unable to be read');
+                EPVSession.error('CSVTemplateExtraction','FailedExtraction','Some variables were unable to be read');
             end
-            EPVSession.succeed('ExcelTemplateExtraction','Extraction','All variables were extracted');
+            EPVSession.succeed('CSVTemplateExtraction','Extraction','All variables were extracted');
         end
         
-        function [sheets, cache] = checkTemplateIntegrity(file, template)
-            % confirm all sheets are present
-            var_sheets = cellfun(@(x)(x{2}),template.variables,'UniformOutput',0);
-            fix_sheets = cellfun(@(x)(x{1}),template.fixed_values,'UniformOutput',0);
-            sheets = unique([var_sheets; fix_sheets]);
-            
-            missing_sheets = '';
-            cache = cell(numel(sheets),2);
-            for i=1:numel(sheets),
-                try
-                    cache{i,1} = sheets{i};
-                    [~,~,cache{i,2}] = xlsread(file, sheets{i}); % as a side effect, cache what comes out
-                catch
-                    if isempty(missing_sheets), connector = ''; else connector = ', '; end;
-                    missing_sheets = sprintf('%s%s''%s''',missing_sheets,connector,sheets{i});
-                end
-            end
-            if ~isempty(missing_sheets)
-                EPVSession.error('ExcelTemplateExtraction','MissingSheets','In %s, could not find expected sheet(s): %s',file, missing_sheets);
-            end
-            EPVSession.succeed('ExcelTemplateExtraction','ValidSheets','All expected sheets are present');
+        function cache = checkTemplateIntegrity(file, template)
+            % CSV has only one sheet, so we can just read it directly
+            cache = CSVTemplateExtraction.readCSVlikeExcel(file);
             
             %%% confirm that all expected fixed sections of the sheets match the blank template file
             % first, load the blank
             if ~exist(template.blank_file,'file')
-                EPVSession.error('ExcelTemplateExtraction','MissingTemplateFile','Internal error: missing blank template file %s',template.blank_file);
-            end
-            blank_cache = cache;
-            for i=1:numel(sheets),
-                try
-                    if is_octave()
-                        effective_blank = file_in_loadpath(template.blank_file);
-                    else
-                        effective_blank = template.blank_file;
-                    end
-                    [~,~,blank_cache{i,2}] = xlsread(effective_blank, sheets{i}); % read the blank sheets for comparison
-                catch
-                EPVSession.error('ExcelTemplateExtraction','MissingTemplateSheet','Internal error: blank template file missing sheet %s',sheets{i});
+                EPVSession.error('CSVTemplateExtraction','MissingTemplateFile','Internal error: missing blank template file %s',template.blank_file);
+            else
+                if is_octave()
+                    effective_blank = file_in_loadpath(template.blank_file);
+                else
+                    effective_blank = template.blank_file;
                 end
+                blank_cache = CSVTemplateExtraction.readCSVlikeExcel(effective_blank);
             end
             
             failed = false;
             for i=1:numel(template.fixed_values)
-                sheet = template.fixed_values{i}{1};
-                ranges = template.fixed_values{i}(2:end);
+                ranges = template.fixed_values{i}(1:end);
                 for j=1:numel(ranges)
-                    blank_raw = ExcelTemplateExtraction.readExcelFromCache(blank_cache,sheet,ranges{j});
-                    raw = ExcelTemplateExtraction.readExcelFromCache(cache,sheet,ranges{j});
-                    if ~ExcelTemplateExtraction.excelRangeEqual(raw,blank_raw)
+                    blank_raw = CSVTemplateExtraction.readCSVFromCache(blank_cache,ranges{j});
+                    raw = CSVTemplateExtraction.readCSVFromCache(cache,ranges{j});
+                    if ~CSVTemplateExtraction.excelRangeEqual(raw,blank_raw)
                         failed = true;
-                        EPVSession.warn('ExcelTemplateExtraction','ModifiedTemplateRange','Template appears to have been modified: sheet ''%s'' range %s does not match blank',sheet,ranges{j});
+                        EPVSession.warn('CSVTemplateExtraction','ModifiedTemplateRange','Template appears to have been modified: sheet ''%s'' range %s does not match blank',sheet,ranges{j});
                     end
                 end
             end
             if failed,
-                EPVSession.error('ExcelTemplateExtraction','ModifiedTemplate','Template appears to have been modified - some ranges that are expected to be fixed do not match');
+                EPVSession.error('CSVTemplateExtraction','ModifiedTemplate','Template appears to have been modified - some ranges that are expected to be fixed do not match');
             end
-            EPVSession.succeed('ExcelTemplateExtraction','ValidTemplate','Template appears to be intact');
+            EPVSession.succeed('CSVTemplateExtraction','ValidTemplate','Template appears to be intact');
         end
         
         % Internal check to see if two number/string regions are identical
@@ -184,12 +169,12 @@ classdef ExcelTemplateExtraction
                 dim = [1 1];
             elseif numel(separators) == 1
                 r1 = range(1:(separators-1));
-                c1 = ExcelTemplateExtraction.excelCoordToPoint(r1);
+                c1 = CSVTemplateExtraction.excelCoordToPoint(r1);
                 r2 = range((separators+1):end);
-                c2 = ExcelTemplateExtraction.excelCoordToPoint(r2);
+                c2 = CSVTemplateExtraction.excelCoordToPoint(r2);
                 dim = [abs(c2(1)-c1(1))+1, abs(c2(2)-c1(2))+1];
             else % can't have more than 1 separator
-                EPVSession.error('ExcelTemplateExtraction','BadRange','Found more than one '':'' separator in range ''%s''',range);
+                EPVSession.error('CSVTemplateExtraction','BadRange','Found more than one '':'' separator in range ''%s''',range);
             end
         end
         
@@ -198,16 +183,16 @@ classdef ExcelTemplateExtraction
         function points = excelRangeToPoints(range)
             separators = find(range==':'); % find the colon separators
             if numel(separators) == 0 % no separator --> single cell
-                c = ExcelTemplateExtraction.excelCoordToPoint(range);
+                c = CSVTemplateExtraction.excelCoordToPoint(range);
                 points = [c c];
             elseif numel(separators) == 1
                 r1 = range(1:(separators-1));
-                c1 = ExcelTemplateExtraction.excelCoordToPoint(r1);
+                c1 = CSVTemplateExtraction.excelCoordToPoint(r1);
                 r2 = range((separators+1):end);
-                c2 = ExcelTemplateExtraction.excelCoordToPoint(r2);
+                c2 = CSVTemplateExtraction.excelCoordToPoint(r2);
                 points = [c1 c2];
             else % can't have more than 1 separator
-                EPVSession.error('ExcelTemplateExtraction','BadRange','Found more than one '':'' separator in range ''%s''',range);
+                EPVSession.error('CSVTemplateExtraction','BadRange','Found more than one '':'' separator in range ''%s''',range);
             end
         end
 
@@ -233,21 +218,36 @@ classdef ExcelTemplateExtraction
                 point(1) = components(end); % number is the row
                 point(2) = char1*26 + char2;
             catch
-                EPVSession.error('ExcelTemplateExtraction','BadRange','Could not interpret Excel coordinate ''%s''',coord);
+                EPVSession.error('CSVTemplateExtraction','BadRange','Could not interpret CSV coordinate ''%s''',coord);
             end
         end
         
-        function raw = readExcelFromCache(cache,sheet,range)
-            which = find(cellfun(@(x)(strcmp(sheet,x)),cache(:,1)));
-            assert(numel(which)==1); % should match precisely one sheet in cache
-            
-            sheet_raw = cache{which,2};
-            points = ExcelTemplateExtraction.excelRangeToPoints(range);
+        function raw = readCSVFromCache(cache,range)
+            sheet_raw = cache;
+            points = CSVTemplateExtraction.excelRangeToPoints(range);
             % expand sheet if needed
             sheet_size = size(sheet_raw);
             if sheet_size(1)<points(3), sheet_raw((sheet_size(1)+1):points(3),:) = {nan}; end;
             if sheet_size(2)<points(4), sheet_raw(:,(sheet_size(2)+1):points(4)) = {nan}; end;
             raw = sheet_raw(points(1):points(3),points(2):points(4));
+        end
+        
+        function raw = readCSVlikeExcel(filename)
+            % output is a cell array
+            raw = {};
+            % open the file
+            fid = fopen(filename,'r');
+            % read and process one line at a time
+            line = fgetl(fid);
+            while ischar(line)
+                % split line and convert numeric values
+                linecells = strsplit(line,',','CollapseDelimiters',false);
+                rawcells = cellfun(@convertIfNumeric,linecells,'UniformOutput',false);
+                raw(end+1,1:numel(rawcells)) = rawcells;
+                % proceed to next line
+                line = fgetl(fid);
+            end
+            fclose(fid);
         end
     end
 end
