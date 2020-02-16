@@ -130,7 +130,7 @@ classdef CSVTemplateExtraction
                     raw = CSVTemplateExtraction.readCSVFromCache(cache,ranges{j});
                     if ~CSVTemplateExtraction.excelRangeEqual(raw,blank_raw)
                         failed = true;
-                        EPVSession.warn('CSVTemplateExtraction','ModifiedTemplateRange','Template appears to have been modified: sheet ''%s'' range %s does not match blank',sheet,ranges{j});
+                        EPVSession.warn('CSVTemplateExtraction','ModifiedTemplateRange','Template appears to have been modified: range %s does not match blank',ranges{j});
                     end
                 end
             end
