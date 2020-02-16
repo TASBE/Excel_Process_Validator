@@ -12,6 +12,10 @@ function test_suite = test_validation_catalog
 
 function test_catalog_listings
 
+if is_octave()
+    return % octave can't to method reflection the same way
+end
+
 listings = ValidationCatalog.list();
 m = methods(ValidationCatalog);
 
