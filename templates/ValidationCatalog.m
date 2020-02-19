@@ -18,33 +18,33 @@ classdef ValidationCatalog
             };
         end
         
-        function iGEM_2019_plate_reader_fluorescence_v2(datafile)
+        function result = iGEM_2019_plate_reader_fluorescence_v2(datafile)
             template = iGEM_2019_plate_reader_fluorescence_v2();
             result = ExcelTemplateExtraction.extract(datafile,template);
             validate_plate_Abs600(result);
             validate_plate_fluorescence(result);
         end
         
-        function iGEM_2019_plate_reader_fluorescence(datafile)
+        function result = iGEM_2019_plate_reader_fluorescence(datafile)
             template = iGEM_2019_plate_reader_fluorescence();
             result = ExcelTemplateExtraction.extract(datafile,template);
             validate_plate_Abs600(result);
             validate_plate_fluorescence(result);
         end
         
-        function iGEM_2019_plate_reader_abs600(datafile)
+        function result = iGEM_2019_plate_reader_abs600(datafile)
             template = iGEM_2019_plate_reader_abs600();
             result = ExcelTemplateExtraction.extract(datafile,template);
             validate_plate_Abs600(result);
         end
         
-        function iGEM_2019_flow_cytometer_fluorescence(datafile)
+        function result = iGEM_2019_flow_cytometer_fluorescence(datafile)
             template = iGEM_2019_flow_cytometer_fluorescence();
             result = ExcelTemplateExtraction.extract(datafile,template);
             validate_flow_fluorescence(result);
         end
 
-        function iGEM_2018_plate_reader_fluorescence(datafile)
+        function result = iGEM_2018_plate_reader_fluorescence(datafile)
             template = iGEM_2018_plate_reader_fluorescence();
             result = ExcelTemplateExtraction.extract(datafile,template);
             validate_plate_Abs600(result);
