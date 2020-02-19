@@ -18,7 +18,7 @@ function directories_added=epv_set_path()
 
     root_dir=fileparts(mfilename('fullpath'));
 
-    sub_dirs={'code', 'templates', 'validators'}; % Add directories here as needed
+    sub_dirs={'code', 'templates', 'validators', 'library_code/jsonlab'}; % Add directories here as needed
     
     % Check if it's Octave; if not, assume matlab
 %     v = ver();
