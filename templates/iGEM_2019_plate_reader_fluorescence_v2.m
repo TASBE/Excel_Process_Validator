@@ -2,6 +2,9 @@ function template = iGEM_2019_plate_reader_fluorescence_v2()
 
 template = struct();
 
+template.parameters = struct();
+template.parameters.fluorescence_unit = 'MEFL';
+
 template.variables = {...
     % Particle calibration sheet
     {'Abs600_raw',                  'Particle standard curve', 'B2:M5'};
@@ -19,16 +22,16 @@ template.variables = {...
     {'uM_fluorescein',              'Fluorescein standard curve', 'B28:L28'};
     {'uM_per_au',                   'Fluorescein standard curve', 'B29:L29'};
     {'mean_uM_per_au',              'Fluorescein standard curve', 'C30'};
-    {'MEFL_per_au',                 'Fluorescein standard curve', 'C31'};
+    {'MEx_per_au',                  'Fluorescein standard curve', 'C31'};
     % Raw plate data
     {'experiment_Abs600',           'Raw Experimental Measurements', 'B12:M19'};
     {'experiment_au',               'Raw Experimental Measurements', 'B24:M31'};
     {'experiment_blank_wells',      'Raw Experimental Measurements', 'D5:D8', 'string'};
     % Calibrated plate data
-    {'experiment_MEFL_per_particle','Expt. Fluorescence per Particle', 'B12:M19'};
+    {'experiment_MEx_per_particle', 'Expt. Fluorescence per Particle', 'B12:M19'};
     {'experiment_particles',        'Expt. Fluorescence per Particle', 'B23:M30'};
     {'experiment_net_Abs600',       'Expt. Fluorescence per Particle', 'B34:M41'};
-    {'experiment_MEFL',             'Expt. Fluorescence per Particle', 'B45:M52'};
+    {'experiment_MEx',              'Expt. Fluorescence per Particle', 'B45:M52'};
     };
 
 template.blank_file = 'iGEM 2019 Plate Reader Fluorescence Calibration v2.xlsx';

@@ -46,15 +46,15 @@ end
 % ignore uM_fluorescein, uM_per_au, mean_uM_per_au as just intermediate computation values
 
 %%% Check that some positive value was obtained for conversion
-if ~(fluorescence_experiment.MEFL_per_au > 0)
-    EPVSession.warn('Fluorescence','PositiveScalingFactor','Computed mean MEFL / a.u. is not positive');
+if ~(fluorescence_experiment.MEx_per_au > 0)
+    EPVSession.warn('Fluorescence','PositiveScalingFactor','Computed mean %s / a.u. is not positive',fluorescence_experiment.parameters.fluorescence_unit);
     valid = false;
 else
-    EPVSession.succeed('Fluorescence','PositiveScalingFactor','Computed mean MEFL / a.u. is positive');
+    EPVSession.succeed('Fluorescence','PositiveScalingFactor','Computed mean %s / a.u. is positive',fluorescence_experiment.parameters.fluorescence_unit);
 end
 
-% we will ignore as raw or intermediate the experiment_au and experiment_MEFL
-% We will also ignore the final experiment_MEFL_per_particle as having no defined range
+% we will ignore as raw or intermediate the experiment_au and experiment_MEx
+% We will also ignore the final experiment_MEx_per_particle as having no defined range
 % TODO: identify positive and negative controls, and make sure their values are reasonable
 
 % Final report on validity:

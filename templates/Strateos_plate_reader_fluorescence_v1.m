@@ -2,6 +2,9 @@ function template = Strateos_plate_reader_fluorescence_v1()
 
 template = struct();
 
+template.parameters = struct();
+template.parameters.fluorescence_unit = 'MEFL';
+
 template.variables = {...
     % Fluorescein calibration sheet
     {'au_raw',                      'C2:C49'};
@@ -26,7 +29,7 @@ fluorescence_experiment.au_net_mean = fluorescence_experiment.au_mean(1:end-1)-f
 
 % compute conversion factor
 fluorescein_uM = [25.0 12.5 6.25 3.125 1.5625];
-MEFL_per_uM = 6.02e13;
+MEx_per_uM = 6.02e13;
 
 fluorescence_experiment.uM_per_au = mean(fluorescein_uM ./ fluorescence_experiment.au_net_mean(2:6));
-fluorescence_experiment.MEFL_per_au = fluorescence_experiment.uM_per_au * MEFL_per_uM;
+fluorescence_experiment.MEx_per_au = fluorescence_experiment.uM_per_au * MEx_per_uM;
