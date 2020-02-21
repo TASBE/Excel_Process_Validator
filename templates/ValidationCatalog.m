@@ -10,7 +10,8 @@ classdef ValidationCatalog
     methods(Static)
         function l = list()
             l = {
-                'iGEM Plate Reader Fluorescence v2',       'iGEM_2019_plate_reader_fluorescence_v2';
+                'iGEM Plate Reader Fluorescence v2 - Green/Yellow',       'iGEM_2019_plate_reader_fluorescence_v2';
+                'iGEM Plate Reader Fluorescence v2 - Red',       'iGEM_2019_plate_reader_fluorescence_v2_texas_red';
                 'iGEM Plate Reader Abs600'                 'iGEM_2019_plate_reader_abs600';
                 'iGEM Flow Cytometer Fluorescence'         'iGEM_2019_flow_cytometer_fluorescence';
                 'iGEM Plate Reader Fluorescence v1',       'iGEM_2019_plate_reader_fluorescence';
@@ -20,6 +21,13 @@ classdef ValidationCatalog
         
         function result = iGEM_2019_plate_reader_fluorescence_v2(datafile)
             template = iGEM_2019_plate_reader_fluorescence_v2();
+            result = ExcelTemplateExtraction.extract(datafile,template);
+            validate_plate_Abs600(result);
+            validate_plate_fluorescence(result);
+        end
+        
+        function result = iGEM_2019_plate_reader_fluorescence_v2_texas_red(datafile)
+            template = iGEM_2019_plate_reader_fluorescence_v2_texas_red();
             result = ExcelTemplateExtraction.extract(datafile,template);
             validate_plate_Abs600(result);
             validate_plate_fluorescence(result);

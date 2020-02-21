@@ -34,6 +34,9 @@ classdef CSVTemplateExtraction
                     EPVSession.error('CSVTemplateExtraction','FailedPostprocessing','CSV file postprocessing error');
                 end
             end
+            
+            % pass through template parameters
+            extracted.parameters = template.parameters;
         end
         
     end

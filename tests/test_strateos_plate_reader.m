@@ -17,7 +17,7 @@ template = Strateos_plate_reader_fluorescence_v1();
 result = CSVTemplateExtraction.extract(testfile,template);
 validate_plate_fluorescence(result);
 
-assertElementsAlmostEqual(result.MEFL_per_au,1.5750e+12,'relative',0.01);
+assertElementsAlmostEqual(result.MEx_per_au,1.5750e+12,'relative',0.01);
 
 log = EPVSession.list();
 % check that the right success messages have been created

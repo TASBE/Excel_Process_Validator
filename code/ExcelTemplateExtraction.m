@@ -24,6 +24,9 @@ classdef ExcelTemplateExtraction
             
             % read the variables of the template
             extracted = ExcelTemplateExtraction.retrieveVariables(file, template, cache);
+            
+            % pass through template parameters
+            extracted.parameters = template.parameters;
         end
         
     end
