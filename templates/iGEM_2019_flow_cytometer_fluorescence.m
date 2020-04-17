@@ -2,6 +2,8 @@ function template = iGEM_2019_flow_cytometer_fluorescence()
 
 template = struct();
 
+template.parameters = struct();
+
 template.variables = {...
     % Particle calibration sheet
     {'bead_model',          'Bead Calibration', 'B2', 'string'};

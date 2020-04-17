@@ -2,6 +2,9 @@ function template = iGEM_2018_plate_reader_fluorescence()
 
 template = struct();
 
+template.parameters = struct();
+template.parameters.fluorescence_unit = 'MEFL';
+
 template.variables = {...
     % LUDOX calibration sheet
     {'LUDOX_Abs600',                'OD600 reference point', 'B2:B5'};
@@ -27,13 +30,13 @@ template.variables = {...
     {'uM_fluorescein',              'Fluorescein standard curve', 'B28:L28'};
     {'uM_per_au',                   'Fluorescein standard curve', 'B29:L29'};
     {'mean_uM_per_au',              'Fluorescein standard curve', 'C30'};
-    {'MEFL_per_au',                 'Fluorescein standard curve', 'C31'};
+    {'MEx_per_au',                 'Fluorescein standard curve', 'C31'};
     % Raw plate data
     {'experiment_Abs600',           'Raw Plate Reader Measurements', 'M17:U24'};
     {'experiment_au',               'Raw Plate Reader Measurements', 'B17:J24'};
     % Calibrated plate data
     {'experiment_uM_per_OD',        'Fluorescence per OD', 'B20:I27'};
-    {'experiment_MEFL_per_particle','Fluorescence per Particle', 'B20:I27'};
+    {'experiment_MEx_per_particle','Fluorescence per Particle', 'B20:I27'};
     {'experiment_net_au',           'Fluorescence per Particle', 'K20:R27'};
     {'experiment_net_Abs600',       'Fluorescence per Particle', 'T20:AA27'};
     };

@@ -2,6 +2,8 @@ function template = iGEM_2019_plate_reader_abs600()
 
 template = struct();
 
+template.parameters = struct();
+
 template.variables = {...
     % Particle calibration sheet
     {'Abs600_raw',                  'Particle standard curve', 'B2:M5'};

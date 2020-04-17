@@ -1,9 +1,9 @@
-function template = iGEM_2019_plate_reader_fluorescence_v2()
+function template = iGEM_2019_plate_reader_fluorescence_v2_texas_red()
 
 template = struct();
 
 template.parameters = struct();
-template.parameters.fluorescence_unit = 'MEFL';
+template.parameters.fluorescence_unit = 'METR';
 
 template.variables = {...
     % Particle calibration sheet
@@ -15,14 +15,14 @@ template.variables = {...
     {'particles_per_Abs600',        'Particle standard curve', 'B29:L29'};
     {'mean_particles_per_Abs600',   'Particle standard curve', 'C30'};
     % Fluorescein calibration sheet
-    {'au_raw',                      'Fluorescein standard curve', 'B2:M5'};
-    {'au_mean',                     'Fluorescein standard curve', 'B6:M6'};
-    {'au_std',                      'Fluorescein standard curve', 'B7:M7'};
-    {'au_net_mean',                 'Fluorescein standard curve', 'B8:L8'};
-    {'uM_fluorescein',              'Fluorescein standard curve', 'B28:L28'};
-    {'uM_per_au',                   'Fluorescein standard curve', 'B29:L29'};
-    {'mean_uM_per_au',              'Fluorescein standard curve', 'C30'};
-    {'MEx_per_au',                  'Fluorescein standard curve', 'C31'};
+    {'au_raw',                      'Texas Red standard curve', 'B2:M5'};
+    {'au_mean',                     'Texas Red standard curve', 'B6:M6'};
+    {'au_std',                      'Texas Red standard curve', 'B7:M7'};
+    {'au_net_mean',                 'Texas Red standard curve', 'B8:L8'};
+    {'uM_fluorescein',              'Texas Red standard curve', 'B28:L28'};
+    {'uM_per_au',                   'Texas Red standard curve', 'B29:L29'};
+    {'mean_uM_per_au',              'Texas Red standard curve', 'C30'};
+    {'MEx_per_au',                  'Texas Red standard curve', 'C31'};
     % Raw plate data
     {'experiment_Abs600',           'Raw Experimental Measurements', 'B12:M19'};
     {'experiment_au',               'Raw Experimental Measurements', 'B24:M31'};
@@ -34,7 +34,7 @@ template.variables = {...
     {'experiment_MEx',              'Expt. Fluorescence per Particle', 'B45:M52'};
     };
 
-template.blank_file = 'iGEM 2019 Plate Reader Fluorescence Calibration v2.xlsx';
+template.blank_file = 'iGEM 2019 Plate Reader Fluorescence Calibration v2_Texas Red.xlsx';
 
 template.fixed_values = {...
     % Particle calibration sheet
@@ -42,9 +42,9 @@ template.fixed_values = {...
     {'Particle standard curve', 'A28:M28','A29','M29','A30:B30','D30:M30','A31:M31'};
     {'Particle standard curve', 'R20:T30'};
     % Fluorescein calibration sheet
-    {'Fluorescein standard curve', 'A1:N1','A2:A8','M8','A9:N9','N2:N8'};
-    {'Fluorescein standard curve', 'A28:M28','A29','M29','A30:B31','D30:M31','A32:M32'};
-    {'Fluorescein standard curve', 'R21:T26'};
+    {'Texas Red standard curve', 'A1:N1','A2:A8','M8','A9:N9','N2:N8'};
+    {'Texas Red standard curve', 'A28:M28','A29','M29','A30:B31','D30:M31','A32:M32'};
+    {'Texas Red standard curve', 'R21:T26'};
     % Raw plate data
     {'Raw Experimental Measurements', 'A4:I4','A5:C8','E5:G8','I5:I8','A9:I9'};
     {'Raw Experimental Measurements', 'A11:N11','A12:A19','N12:N19','A20:N20'};
