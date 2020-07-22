@@ -7,7 +7,10 @@ automatically check calibration and process control data stored in an
 Excel spreadsheet.
 
 The software is generalized so that it can potentially read many 
-different types of spreadsheets.
+different types of spreadsheets, but has mainly been set up for plate reader data calibrated with the iGEM fluorescence and OD protocols.
+
+An introductory tutorial on plate reader fluorescence and OD measurement, calibration, and data interpretation can be found in the [iGEM Fluorescence Tutorials](https://github.com/iGEM-Measurement-Tools/Fluorescence-Tutorials).
+
 
 Planned stages of automated processing:
 
