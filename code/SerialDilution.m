@@ -53,8 +53,8 @@ classdef SerialDilution
             SD.beta = beta;
             SD.epsilon = epsilon;
             SD.dose = dose;
-            if nargin>=3, SD.n = n; end
-            if nargin>=4, SD.alpha = alpha; end
+            if nargin>=4, SD.n = n; end
+            if nargin>=5, SD.alpha = alpha; end
         end
         
         % Tale random samples of the error distribution of this serial dilution model
